@@ -1,4 +1,9 @@
 
+// one tile on the board
+//const tile {
+  //  
+//}
+
 let board = [];
 let size = {
     col: 8,
@@ -6,13 +11,10 @@ let size = {
     mine: 8
 };
 
-// returns deep freeze copy of board state
-function getBoard() {
-    let copy = [];
-    for (let i = 0; i < size.row; i++) {
-        copy[i] = Object.freeze({ ...board[i] });
-    }
-    return copy;
+// action taken when a hard inquiry is made (potentially triggering mines)
+// returns adjacent value (incursively on 0), marks spot
+function query(col, row) {
+
 }
 
 // builds out state information of board
