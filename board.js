@@ -1,9 +1,13 @@
 
 // one tile on the board
-//const tile {
-  //  
-//}
+class tile {
+    constructor () {
+        this.is_mine = false;
+        this.adjacent = false;
+    }
+}
 
+// stateful information of board
 let board = [];
 let size = {
     col: 8,
@@ -11,14 +15,29 @@ let size = {
     mine: 8
 };
 
-// action taken when a hard inquiry is made (potentially triggering mines)
-// returns adjacent value (incursively on 0), marks spot
-function query(col, row) {
-
+// resizes board and rebuilds
+function new_board(col, row, mines) {
+    size.col = col;
+    size.row = row;
+    size.mine = mines;
+    _build_board();
 }
 
-// builds out state information of board
-function buildBoard() {
+// returns value of adjacent, -1 if out of bounds, and 9 if it is a mine
+function query(col, row) {
+    if (col < 0 || col >= size.col || row < 0 || row >= size.row) {
+        return -1;
+    }
+
+    if (board[col][row].is_mine) {
+        return 9;
+    }
+
+    return board[col][row].adjacent;
+}
+
+// resets, then builds out state information of board
+function _build_board() {
     let board = [];
 
     _build_empty();
@@ -31,12 +50,7 @@ function _build_empty() {
     for (let i = 0; i < size.col; i++) {
         board[i] = [];
         for (let j = 0; j < size.row; j++) {
-            board[i][j] = {
-                is_mine: false,
-                adjacent: 0,
-                is_revealed: false,
-                is_flagged: false
-            };
+            board[i][j] = new tile();
         }
     }
 }
@@ -100,3 +114,5 @@ function _increment_adjacent(col, row) {
         }
     }
 }
+
+export { new_board, query };
