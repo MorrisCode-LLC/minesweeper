@@ -1,11 +1,4 @@
-
-// one tile on the board
-class tile {
-    constructor () {
-        this.is_mine = false;
-        this.adjacent = false;
-    }
-}
+import { tile } from './tile.js';
 
 // stateful information of board
 let board = [];
@@ -33,7 +26,7 @@ function query(col, row) {
         return 9;
     }
 
-    return board[col][row].adjacent;
+    return board[col][row];
 }
 
 // resets, then builds out state information of board
@@ -115,4 +108,4 @@ function _increment_adjacent(col, row) {
     }
 }
 
-export { new_board, query };
+export { new_board, query, size };
