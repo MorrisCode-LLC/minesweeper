@@ -22,10 +22,6 @@ function query(col, row) {
         return -1;
     }
 
-    if (board[col][row].is_mine) {
-        return 9;
-    }
-
     return board[col][row];
 }
 

@@ -5,6 +5,7 @@ import * as readline from 'readline';
 let mines_active = 0;
 let flags = 0;
 let seconds = 0.0;
+let game_started = false;
 
 const input_re = /^([A-Za-z])(?:\s+(\d{1,2}))?(?:\s+(\d{1,2}))?$/;
 
@@ -62,6 +63,7 @@ function _new(new_size) {
     let col = 8;
     let row = 8;
     let mines = 8;
+    game_started = true;
 
     switch(new_size) {
         case 1:
@@ -95,9 +97,9 @@ function _new(new_size) {
     _display();
 }
 
-function _reveal(x, y) {
-    if (!x || !y) {
-        _error_input();
+function _reveal(x, y, top_loader=true) {
+    if (!game_started) {
+        console.log("No active game. Type \"n [size]\" for a new game.");
         return;
     }
 
@@ -106,13 +108,43 @@ function _reveal(x, y) {
         return;
     }
 
-    if (query(x, y).is_revealed()) {
+    let tile = query(x, y);
+
+    if (tile.is_mine) {
+        console.log("UH OH! NO! ACKHGH! mine bomb boom bomb");
+        _quit();
+        return;
+    }
+
+    if (tile.is_revealed) {
         console.log("Value is already revealed! Try again?");
         return;
+    }
+
+    tile.is_revealed = true;
+
+    // recur
+    if (tile.adjacent == 0) {
+        for (let i = x - 1; i <= x + 1; i++) {
+            for (let j = y - 1; j <= y + 1; j++) {
+                if (i >= 0 && i < size.col && j >= 0 && j < size.row) {
+                    _reveal(i, j, false);
+                }
+            }
+        }
+    }
+
+    if (top_loader) {
+        _display();
     }
 }
 
 function _flag(x, y) {
+    if (!game_started) {
+        console.log("No active game. Type \"n [size]\" for a new game.");
+        return;
+    }
+
     if (!x || !y) {
         _error_input();
         return;
@@ -123,10 +155,13 @@ function _flag(x, y) {
         return;
     }
 
-    if (query(x, y).is_revealed()) {
+    if (query(x, y).is_revealed) {
         console.log("Value is already revealed! Try again?");
         return;
     }
+
+    query(x, y).is_flagged = true;
+    _display();
 }
 
 function _quit() {
@@ -160,6 +195,11 @@ function _help() {
 }
 
 function _display() {
+    if (!game_started) {
+        console.log("No active game. Type \"n [size]\" for a new game.");
+        return;
+    }
+
     console.clear();
     console.log(`minesweeper\t\t${flags} flags; ${mines_active - flags} left\t${seconds}`);
     
@@ -184,6 +224,8 @@ function _display() {
                 print_line += '[?]';
             } else if (!tile.is_revealed) {
                 print_line += '[_]';
+            } else if (tile.adjacent == 0) {
+                print_line += '[0]';
             } else {
                 print_line += `[${tile.adjacent}]`;
             }
